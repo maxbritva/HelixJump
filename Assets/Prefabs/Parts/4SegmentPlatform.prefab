@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1939622124998499255}
   - component: {fileID: 1939622124998499252}
   - component: {fileID: 1939622124998499253}
-  - component: {fileID: 1939622124998499250}
+  - component: {fileID: 5792816721024139265}
   m_Layer: 0
   m_Name: 4SegmentPlatform
   m_TagString: Untagged
@@ -672,11 +672,17 @@ MonoBehaviour:
         m_NumberOfSides: 16
         m_HeightCuts: 0
         m_Smooth: 1
---- !u!33 &1939622124998499250
-MeshFilter:
+--- !u!64 &5792816721024139265
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1939622124998499251}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
   m_Mesh: {fileID: 0}
