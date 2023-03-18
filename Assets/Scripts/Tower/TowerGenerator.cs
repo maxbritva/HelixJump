@@ -1,61 +1,71 @@
 
 using System;
+using System.Collections.Generic;
 using Extensions;
 using Platforms;
+using Structures;
+using Tower;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class TowerGenerator : MonoBehaviour
+public class TowerGenerator : MonoBehaviour 
 {
-	[Header("Platform Rotation")]
-	[SerializeField] [Min(0.0f)] private float _maxYRotation;
-	[SerializeField] [Min(0.0f)] private float _minYRotation;
-
+	[SerializeField] private TowerGenerationSettingsSo _generationSettings;
+	
 	[Header("Tower")]
 	[SerializeField] private Transform _tower;
-	
-	[SerializeField][Min(0)] private int _platformVariantCount;
-	[SerializeField] [Min(0.0f)] private float _offsetBetweenPlatforms;
-	[Header("Platforms")]
-	[SerializeField] private Platform _startPlatformPrefab;
-	[SerializeField] private Platform _finishPlatformPrefab;
-	[SerializeField] private Platform[] _platformVariants = Array.Empty<Platform>();
 
-
+	private FloatRange RotationRange => _generationSettings.RotationRange;
 	private void Start()
 	{
-		Generate();
+		Generate(_generationSettings,_tower);
 	}
 
-	private void Generate()
+	private void Generate(TowerGenerationSettingsSo generationSettings,Transform tower)
 	{
-		float offsetFromTop = _offsetBetweenPlatforms;
+		List<Platform> spawnedPlatforms = SpawnPlatforms(generationSettings, out float offsetFromTop);
+		FitTowerHeight(tower, offsetFromTop);
+		spawnedPlatforms.ForEach(platform => platform.transform.SetParent(tower));
+	}
+	
+	private List<Platform> SpawnPlatforms(TowerGenerationSettingsSo generationSettingsSo,out float offsetFromTop)
+	{ 
+	offsetFromTop = _generationSettings.OffsetBetweenPlatforms;
+	const int startAndLastPlatforms = 2;
+	var spawnedPlatforms = new List<Platform>(_generationSettings.PlatformVariantCount + startAndLastPlatforms);
+	Platform startPlatform = Create(_generationSettings.StartPlatformPrefab, RotationRange, ref offsetFromTop);
+	spawnedPlatforms.Add(startPlatform);
+		for (int i = 0; i < _generationSettings.PlatformVariantCount; i++)
+	{
+		Platform platform = Create(_generationSettings.PlatformVariantPrefab, RotationRange, ref offsetFromTop) ;
+		spawnedPlatforms.Add(platform);
+	}
+	Platform finishPlatform = Create(_generationSettings.FinishPlatformPrefab,RotationRange, ref offsetFromTop);
+	spawnedPlatforms.Add(finishPlatform);
 
-		Platform startPlatform = Create(_startPlatformPrefab, ref offsetFromTop);
-
-		for (int i = 0; i < _platformVariantCount; i++)
-		{
-			Platform platform = Create(_platformVariants.Random(), ref offsetFromTop) ;
-		}
-		Platform finishPlatform = Create(_finishPlatformPrefab, ref offsetFromTop);
-		
-
+	return spawnedPlatforms;
 	}
 
-	private void FitTowerHeight(Transform tower)
+	private void FitTowerHeight(Transform tower, float height)
 	{
 		Vector3 originalSize = tower.localScale;
+		float towerHeight = height / 2.0f;
+		tower.localScale = new Vector3(originalSize.x, towerHeight , originalSize.z);
+		tower.localPosition -= Vector3.up * towerHeight;
 	}
-	private Platform Create(Platform platformPrefab, ref float offsetFromTop)
+	
+	private Vector3 GetRandomYRotation(FloatRange rotationRange) =>
+		Vector3.up * rotationRange.Random;
+	private Platform Create(Platform platformPrefab,FloatRange rotationRange ,ref float offsetFromTop)
 	{
 		Platform createdPlatform = Instantiate(platformPrefab);
 		Transform platformTransform = createdPlatform.transform;
 		platformTransform.position = Vector3.down * offsetFromTop;
-		platformTransform.eulerAngles = GetRandomYRotation();
-		offsetFromTop += platformTransform.localScale.y + _offsetBetweenPlatforms;
+		platformTransform.eulerAngles = GetRandomYRotation(rotationRange);
+		offsetFromTop += platformTransform.localScale.y + _generationSettings.OffsetBetweenPlatforms;
 
 		return createdPlatform;
 	}
-	private Vector3 GetRandomYRotation() => 
-		Vector3.up * Random.Range(_minYRotation, _maxYRotation);
+
+
+	
 }
