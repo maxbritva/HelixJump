@@ -5,32 +5,23 @@ namespace Physics
 	public class Bounce
 	{
 		private readonly Rigidbody _rigidBody;
-		private  readonly float _force;
-		private  readonly float _maxHeight;
+		private readonly BounceData _data;
 
-		public Bounce(Rigidbody rigidBody, float force, float maxHeight)
+		public Bounce(Rigidbody rigidBody, BounceData data)
 		{
 			_rigidBody = rigidBody;
-			_force = force;
-			_maxHeight = maxHeight;
+			_data = data;
 		}
 
 		public void BounceOff(Vector3 direction) => 
-			_rigidBody.AddForce(direction * _force, ForceMode.VelocityChange);
+			_rigidBody.AddForce(direction * _data.Force, ForceMode.VelocityChange);
 
 		public void ClampHeight()
 		{
-			
+			Vector3 Velocity = _rigidBody.velocity;
+			Velocity = Velocity.y >= 0.0f
+				? Vector3.ClampMagnitude(Velocity, _data.MaxHeight)
+				: Velocity;
 		}
-	}
-	
-	public class BounceData 
-	{
-	[SerializeField] private  float _force;
-	[SerializeField] private  float _maxHeight;
-
-	public float Force => _force;
-
-	public float MaxHeight => _maxHeight;
 	}
 }
