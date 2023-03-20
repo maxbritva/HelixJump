@@ -18,10 +18,10 @@ namespace Physics
 
 		public void ClampHeight()
 		{
-			Vector3 Velocity = _rigidBody.velocity;
-			Velocity = Velocity.y >= 0.0f
-				? Vector3.ClampMagnitude(Velocity, _data.MaxHeight)
-				: Velocity;
+			Vector3 velocity = _rigidBody.velocity;
+			velocity = velocity.y >= 0.0f
+				? Vector3.ClampMagnitude(velocity, _data.MaxHeight)
+				: velocity;
 		}
 	}
 }
