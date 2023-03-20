@@ -32,10 +32,11 @@ namespace Ball
 			_bounce.ClampHeight();
 			_bounceEffects.ApplyUpwardsScaleTo(_mesh, _meshInitialScale);
 		}
+		
 
-		private void OnCollisionEnter(Collision other)
+		public void BouceOff(Vector3 direction)
 		{
-			_bounce.BounceOff(Vector3.up);
+			_bounce.BounceOff(direction);
 		}
 	}
 } 
